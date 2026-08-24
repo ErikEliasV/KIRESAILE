@@ -7,9 +7,10 @@ const HOVER_SELECTOR =
 
 /**
  * A square cursor that trails the pointer with a slight lag, then grows
- * and picks up a label when it crosses something interactive. Skipped
- * entirely on touch/coarse pointers and for prefers-reduced-motion, so
- * the native cursor is always the fallback.
+ * and picks up a label when it crosses something interactive. Skipped on
+ * touch/coarse pointers, where there's no cursor to replace. Runs
+ * regardless of prefers-reduced-motion — it's a cursor replacement, not
+ * ambient motion, so the native cursor is the only fallback needed.
  */
 export function CursorFollower() {
   const ringRef = useRef<HTMLDivElement>(null);
@@ -18,10 +19,7 @@ export function CursorFollower() {
 
   useEffect(() => {
     const fine = window.matchMedia("(pointer: fine)").matches;
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    if (!fine || reduced) return;
+    if (!fine) return;
 
     const ring = ringRef.current;
     const dot = dotRef.current;
