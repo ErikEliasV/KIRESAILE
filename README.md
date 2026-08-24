@@ -16,8 +16,6 @@ O nome **KIRESAILE** é o meu próprio nome — **Erik Elias** — invertido (Er
 
 ### Screenshots
 
-> Crie uma pasta `screenshots/` na raiz do projeto e salve cada imagem com o nome indicado. Sugestão: navegador em ~1440px de largura, tema claro, sem o cursor do mouse visível.
-
 | Seção | Arquivo | O que fotografar |
 |-------|---------|-------------------|
 | Hero | `screenshots/hero.png` | Topo da Home (`/`), assim que a página carrega: o wordmark "KIRESAILE" fantasma atrás da cabeça do retrato, "KIRE / SAILE" em azul, botão "Shop now" e "VANCOUVER Signature" à direita. |
