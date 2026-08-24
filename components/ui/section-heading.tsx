@@ -2,8 +2,9 @@ import type { ReactNode } from "react";
 
 type SectionHeadingProps = {
   children: ReactNode;
-  /** Sacramento accent, rationed to one use per screen. */
-  script?: string;
+  /** Sacramento accent, rationed to one use per screen. Takes a node so the
+   *  hero can hand it a <Typewriter> instead of a plain string. */
+  script?: ReactNode;
   align?: "left" | "center" | "right";
   size?: "hero" | "display" | "title";
   tone?: "ink" | "accent" | "invert";
