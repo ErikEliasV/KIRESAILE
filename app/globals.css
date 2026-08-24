@@ -97,7 +97,10 @@
   --font-script: var(--font-sacramento), "Snell Roundhand", cursive;
 
   --text-hero: clamp(64px, 11vw, 168px);
-  --text-display: clamp(44px, 6vw, 88px);
+  /* 40px floor, not 44: right-aligned "Vancouver" is the widest display
+     heading in the system and at 44px it overran a 320px viewport by 4px.
+     The floor only bites below 667px, so desktop sizing is untouched. */
+  --text-display: clamp(40px, 6vw, 88px);
   --text-title: 36px;
   --text-heading: 24px;
   --text-label: 11px;

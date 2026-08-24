@@ -23,7 +23,10 @@ export function NewsletterForm() {
 
   return (
     <form onSubmit={submit} className="flex max-w-[420px] items-end gap-4">
-      <label className="flex flex-1 flex-col gap-2">
+      {/* min-w-0: a flex item defaults to min-width:auto, and an <input>'s
+          intrinsic minimum is ~20 characters — so this refused to shrink and
+          pushed the page into a horizontal scroll on a 320px screen. */}
+      <label className="flex min-w-0 flex-1 flex-col gap-2">
         <span className="kire-label text-ink-300">Email</span>
         {/* Fields never gain a box — the bottom rule does the work. */}
         <input
