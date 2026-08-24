@@ -4,7 +4,7 @@ Uma landing page de e-commerce desenvolvida com Next.js 16, TypeScript e Tailwin
 
 ![Preview do projeto](./screenshots/hero.png)
 
-<!-- 🔗 **[Ver projeto ao vivo](https://SEU-LINK-AQUI)** — adicione o link depois do deploy (Vercel, por exemplo) -->
+🔗 **[Ver projeto ao vivo](https://erikeliasv.github.io/KIRESAILE/)**
 
 ---
 
@@ -81,15 +81,17 @@ Acesse [http://localhost:3000](http://localhost:3000) no navegador.
 ### Outros comandos
 
 ```bash
-# Build de produção
+# Build de produção (gera o site estático em ./out)
 npm run build
 
-# Iniciar servidor de produção
+# Servir o build estático localmente para conferir antes do deploy
 npm start
 
 # Executar lint
 npm run lint
 ```
+
+O projeto é publicado como site estático (`output: "export"`) — não roda `next start`. A cada push em `main`, o GitHub Actions builda e publica automaticamente em [https://erikeliasv.github.io/KIRESAILE/](https://erikeliasv.github.io/KIRESAILE/) (veja `.github/workflows/deploy.yml`).
 
 ---
 
@@ -97,7 +99,11 @@ npm run lint
 
 ```
 KIRESAILE/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml              # build + deploy automático no GitHub Pages
 ├── public/
+│   ├── .nojekyll
 │   └── media/
 │       ├── product-01.jpg ... product-06.jpg
 │       ├── girl-model-mono-edit.png

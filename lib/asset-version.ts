@@ -21,6 +21,13 @@ function fileVersion(publicPath: string): string {
   }
 }
 
+/**
+ * On GitHub Pages the site is served under /KIRESAILE — next/image and plain
+ * <video>/<img> tags don't get basePath applied automatically the way
+ * next/link does, so every local media reference is prefixed here, in the
+ * one place they all already pass through.
+ */
 export function versioned(publicPath: string): string {
-  return `${publicPath}?v=${fileVersion(publicPath)}`;
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+  return `${basePath}${publicPath}?v=${fileVersion(publicPath)}`;
 }
