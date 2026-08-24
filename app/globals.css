@@ -1,26 +1,219 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------
+   KIRESAILE — design tokens.
+   Mirrors "KIRESAILE Design System"/tokens/*.css. Radius is 0 on
+   everything; the brand is drawn in rules, not shadows.
+   ------------------------------------------------------------------ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Base — electric blue */
+  --blue-900: #0d0d7a;
+  --blue-700: #1414b4;
+  --blue-600: #1b1be0;
+  --blue-400: #5c5cf0;
+  --blue-200: #b9b9fa;
+  --blue-100: #dcdcfb;
+
+  /* Base — ink */
+  --ink-900: #0b0b0b;
+  --ink-700: #2a2a2a;
+  --ink-500: #4a4a4a;
+  --ink-300: #8c8a85;
+
+  /* Base — paper */
+  --cream-100: #fbf9f3;
+  --cream-200: #f6f2e9;
+  --cream-300: #ede8da;
+  --paper: #ffffff;
+  --line-200: #d8d3c7;
+  --photo-grey: #b9b7b2;
+
+  /* Semantic */
+  --surface-page: var(--cream-200);
+  --surface-card: var(--cream-100);
+  --surface-ink: var(--ink-900);
+  --text-body: var(--ink-900);
+  --text-muted: var(--ink-500);
+  --text-faint: var(--ink-300);
+  --text-accent: var(--blue-600);
+  --text-on-accent: var(--cream-100);
+  --border-hairline: var(--line-200);
+  --accent: var(--blue-600);
+  --accent-press: var(--blue-700);
+  --state-danger: #b01b1b;
+
+  /* Spacing / layout */
+  --gutter: 14px;
+  --page-pad-x: clamp(16px, 4vw, 64px);
+  --marquee-h: 38px;
+  --nav-h: 64px;
+  --max-width: 1440px;
+
+  /* Motion */
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 420ms;
+  --ease-standard: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-blue-900: var(--blue-900);
+  --color-blue-700: var(--blue-700);
+  --color-blue-600: var(--blue-600);
+  --color-blue-400: var(--blue-400);
+  --color-blue-200: var(--blue-200);
+  --color-blue-100: var(--blue-100);
+
+  --color-ink-900: var(--ink-900);
+  --color-ink-700: var(--ink-700);
+  --color-ink-500: var(--ink-500);
+  --color-ink-300: var(--ink-300);
+
+  --color-cream-100: var(--cream-100);
+  --color-cream-200: var(--cream-200);
+  --color-cream-300: var(--cream-300);
+  --color-paper: var(--paper);
+  --color-line-200: var(--line-200);
+  --color-photo-grey: var(--photo-grey);
+  --color-danger: var(--state-danger);
+
+  --font-display: var(--font-archivo-black), "Archivo Black", "Helvetica Neue", Arial, sans-serif;
+  --font-ui: var(--font-archivo), "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-script: var(--font-sacramento), "Snell Roundhand", cursive;
+
+  --text-hero: clamp(64px, 11vw, 168px);
+  --text-display: clamp(44px, 6vw, 88px);
+  --text-title: 36px;
+  --text-heading: 24px;
+  --text-label: 11px;
+  --text-script: clamp(32px, 4vw, 64px);
+
+  --tracking-hero: -0.045em;
+  --tracking-label: 0.14em;
+
+  --radius-none: 0px;
+
+  --ease-standard: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--surface-page);
+    color: var(--text-body);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Radius is 0 everywhere; the radio dot is the one exception. */
+  *:not([type="radio"]) {
+    border-radius: 0;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--text-on-accent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* The `/ LABEL` mark: uppercase, wide tracking, 11px. */
+  .kire-label {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+
+  .kire-display {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: -0.045em;
+    line-height: 1.05;
+  }
+
+  .kire-hero {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: -0.045em;
+    line-height: 0.82;
+  }
+
+  /* Greyscale conformance for any colour source image (see DS: imagery). */
+  .kire-photo {
+    filter: grayscale(1) contrast(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* The marquee is the brand's one deliberate continuous motion (see DS
+     motion guidelines) — exempt it so it keeps looping instead of freezing
+     after a single 0.01ms tick. */
+  .kire-marquee-track {
+    animation-duration: var(--marquee-dur, 26s) !important;
+    animation-iteration-count: infinite !important;
+  }
+}
+
+/* The one continuous motion in the system: 26s linear, infinite. */
+@keyframes kire-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes kire-drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes kire-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes kire-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
