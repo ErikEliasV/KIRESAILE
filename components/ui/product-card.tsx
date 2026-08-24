@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCart } from "@/components/cart-context";
+import { useReveal } from "@/lib/use-reveal";
 import { formatPrice, type Product } from "@/lib/catalog";
 import { Icon } from "./icon";
 import { MediaFrame } from "./media-frame";
@@ -14,13 +15,18 @@ type ProductCardProps = {
 
 export function ProductCard({ product, sizes, priority }: ProductCardProps) {
   const { add } = useCart();
+  const { ref, className: revealClassName } = useReveal<HTMLDivElement>();
 
   return (
-    <div className="group flex flex-col border-2 border-blue-600 bg-cream-100 transition-transform duration-[220ms] ease-standard hover:-translate-y-0.5">
+    <div
+      ref={ref}
+      className={`group flex flex-col border-2 border-blue-600 bg-cream-100 transition-transform duration-[220ms] ease-standard hover:-translate-y-0.5 ${revealClassName}`}
+    >
       <div className="relative">
         <Link
           href={`/product/${product.slug}`}
           aria-label={product.name}
+          data-cursor-text="View"
           className="block"
         >
           <MediaFrame
@@ -55,6 +61,7 @@ export function ProductCard({ product, sizes, priority }: ProductCardProps) {
         <button
           type="button"
           aria-label={`Add ${product.name} to bag`}
+          data-cursor-text="Add"
           onClick={() => add(product)}
           className="inline-flex size-[42px] shrink-0 cursor-pointer items-center justify-center bg-blue-600 text-cream-100 transition-colors duration-[140ms] ease-standard hover:bg-blue-700 active:translate-y-px"
         >
