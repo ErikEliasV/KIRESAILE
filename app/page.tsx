@@ -41,15 +41,26 @@ export default function HomePage() {
       {/* Hero — the model is cropped at the knee, so she sits flush on the
           section's bottom edge with no padding under her. */}
       <section className="relative overflow-hidden bg-cream-100 px-[var(--page-pad-x)]">
-        <div className="relative mx-auto grid max-w-[1440px] items-end gap-6 pt-6 md:grid-cols-[minmax(0,1fr)_minmax(480px,900px)_minmax(0,1fr)]">
+        <div className="relative mx-auto grid max-w-[1440px] grid-cols-[minmax(0,1fr)] items-end gap-6 pt-6 md:grid-cols-[minmax(0,1fr)_minmax(480px,900px)_minmax(0,1fr)]">
           {/* left column — the wordmark writes itself on, so it carries no
               .kire-intro fade of its own; the typing is the entrance. */}
-          <div className="flex flex-col gap-8 pb-10">
-            <SectionHeading as="h1" size="hero" tone="accent" className="mt-10">
-              <Typewriter text="Kire" startDelay={700} erase={2} />
-            </SectionHeading>
+          <div className="flex flex-col gap-6 pb-0 md:gap-8 md:pb-10">
+            {/* On mobile the parallax "Saile" below has nowhere to sit, so
+                the wordmark stacks here instead — same size, no gap, so the
+                two halves read as one block at line-height 0.82. */}
+            <div className="flex flex-col">
+              <SectionHeading as="h1" size="hero" tone="accent" className="mt-4 md:mt-10">
+                <Typewriter text="Kire" startDelay={700} erase={2} />
+              </SectionHeading>
+              <span
+                aria-hidden="true"
+                className="kire-hero text-hero text-blue-600 select-none md:hidden"
+              >
+                <Typewriter text="Saile" startDelay={2000} />
+              </span>
+            </div>
             <div
-              className="kire-intro flex flex-col gap-8"
+              className="kire-intro flex flex-col gap-6 md:gap-8"
               style={intro(2500, -44, 0)}
             >
               <ButtonLink
@@ -61,7 +72,7 @@ export default function HomePage() {
                 Shop now
               </ButtonLink>
               <div className="kire-label flex items-end gap-4">
-                <span className="h-[90px] border-l border-ink-900 pl-1.5 [writing-mode:vertical-rl] [transform:rotate(180deg)]">
+                <span className="h-[64px] border-l border-ink-900 pl-1.5 md:h-[90px] [writing-mode:vertical-rl] [transform:rotate(180deg)]">
                   2025
                 </span>
                 <span className="text-ink-500">Est.</span>
@@ -70,8 +81,8 @@ export default function HomePage() {
           </div>
 
           {/* centre — the model, greyscaled to the paper, glued to the bottom */}
-          <div className="relative order-first self-end md:order-none">
-            <div className="relative mx-auto aspect-[864/1014] h-[clamp(460px,86vh,1040px)] w-auto">
+          <div className="relative order-last self-end md:order-none">
+            <div className="relative mx-auto aspect-[864/1014] w-full max-w-[440px] md:h-[clamp(460px,86vh,1040px)] md:w-auto md:max-w-none">
               {/* Ghost wordmark, pinned to the photo's own coordinates (not
                   the viewport) so it always sits behind her head. Drifts
                   slightly slower than the page scroll for depth. */}
@@ -101,6 +112,7 @@ export default function HomePage() {
                 />
               </div>
             </div>
+            {/* md+ only — below that the wordmark stacks in the left column. */}
             <Parallax
               speed={-24}
               className="pointer-events-none absolute bottom-8 -left-[20vw] hidden md:block"
@@ -116,9 +128,14 @@ export default function HomePage() {
 
           {/* right column — Vancouver writes while Saile writes opposite it,
               then the signature is drawn underneath in Sacramento. */}
-          <div className="flex flex-col items-end gap-6 pb-10 text-right">
+          {/* Holds the right edge at every width, mirroring the desktop
+              composition: the wordmark and button own the left, this column
+              answers from the right. Safe on a phone now that the grid track
+              is pinned to minmax(0,1fr) — it used to inherit the model's
+              640px width and push all of this off the screen. */}
+          <div className="flex flex-col items-end gap-5 text-right md:gap-6 md:pb-10">
             <p
-              className="kire-intro max-w-[210px] text-ink-500"
+              className="kire-intro max-w-[280px] text-ink-500 md:max-w-[210px]"
               style={intro(900, 44, 0)}
             >
               Autumn 2025. Tailoring cut for daily wear, made in small runs and
@@ -127,7 +144,7 @@ export default function HomePage() {
             <SectionHeading
               align="right"
               tone="accent"
-              className="mt-8"
+              className="md:mt-8"
               script={
                 <Typewriter text="Signature" startDelay={2000} speed={105} />
               }
@@ -299,7 +316,10 @@ export default function HomePage() {
 
       {/* Newsletter */}
       <section className="bg-ink-900 px-[var(--page-pad-x)] py-16 text-cream-100">
-        <Reveal className="mx-auto grid max-w-[1440px] gap-8 md:grid-cols-2 md:items-end">
+        {/* grid-cols-[minmax(0,1fr)]: a lone implicit column sizes to
+            max-content, so "Restocks only" on one line set the track width
+            and pushed the page into a horizontal scroll on a 320px screen. */}
+        <Reveal className="mx-auto grid max-w-[1440px] grid-cols-[minmax(0,1fr)] gap-8 md:grid-cols-2 md:items-end">
           <SectionHeading size="title" tone="invert">
             Restocks only
           </SectionHeading>
