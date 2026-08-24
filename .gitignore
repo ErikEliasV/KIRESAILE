@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# The design system is internal reference material — never commit it.
+KIRESAILE Design System/
+/KIRESAILE Design System
