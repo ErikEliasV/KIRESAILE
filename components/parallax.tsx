@@ -17,8 +17,7 @@ type ParallaxProps = {
 
 /**
  * Translates its children vertically as the element crosses the
- * viewport. Only runs the scroll loop while the element is in view, and
- * sits out entirely for prefers-reduced-motion.
+ * viewport. Only runs the scroll loop while the element is in view.
  */
 export function Parallax({
   children,
@@ -31,7 +30,6 @@ export function Parallax({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     let frame = 0;
     let active = false;
