@@ -1,15 +1,18 @@
 import type { NextConfig } from "next";
 
+const isProd = process.env.NODE_ENV === "production";
+const basePath = isProd ? "/KIRESAILE" : "";
+
 const nextConfig: NextConfig = {
+  output: "export",
+  basePath,
   images: {
-    localPatterns: [
-      {
-        // /media/** is our own static folder, never user input — every
-        // request carries a ?v=<mtime> cache-buster (see lib/asset-version),
-        // so all query strings need to be allowed here.
-        pathname: "/media/**",
-      },
-    ],
+    // GitHub Pages has no server to run the Next.js image optimizer —
+    // serve local media as-is instead.
+    unoptimized: true,
+  },
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath,
   },
 };
 
