@@ -38,7 +38,7 @@ export function MediaFrame({
           fill
           priority={priority}
           sizes={sizes}
-          className={`kire-photo object-cover ${imageClassName}`}
+          className={`kire-photo object-cover transition-transform duration-[600ms] ease-standard group-hover:scale-[1.06] ${imageClassName}`}
         />
       ) : (
         <>

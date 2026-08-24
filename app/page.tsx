@@ -6,6 +6,8 @@ import { ProductCard } from "@/components/ui/product-card";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { FabricSection } from "@/components/fabric-section";
 import { NewsletterForm } from "@/components/newsletter-form";
+import { Parallax } from "@/components/parallax";
+import { Reveal } from "@/components/reveal";
 import { versioned } from "@/lib/asset-version";
 import { getVersionedProducts } from "@/lib/versioned-catalog";
 
@@ -43,13 +45,20 @@ export default function HomePage() {
           <div className="relative order-first self-end md:order-none">
             <div className="relative mx-auto aspect-[864/1014] h-[clamp(460px,86vh,1040px)] w-auto">
               {/* Ghost wordmark, pinned to the photo's own coordinates (not
-                  the viewport) so it always sits behind her head. */}
-              <span
-                aria-hidden="true"
-                className="kire-hero pointer-events-none absolute top-[23%] left-1/2 w-[220vw] -translate-x-1/2 -translate-y-1/2 text-center text-[clamp(56px,13vw,190px)] text-cream-300 select-none"
+                  the viewport) so it always sits behind her head. Drifts
+                  slightly slower than the page scroll for depth. */}
+              <Parallax
+                speed={30}
+                origin="translate(-50%, -50%)"
+                className="pointer-events-none absolute top-[23%] left-1/2 w-[220vw]"
               >
-                Kiresaile
-              </span>
+                <span
+                  aria-hidden="true"
+                  className="kire-hero block text-center text-[clamp(56px,13vw,190px)] text-cream-300 select-none"
+                >
+                  Kiresaile
+                </span>
+              </Parallax>
               <Image
                 src={versioned("/media/girl-model-mono-edit.png")}
                 alt="KIRESAILE Autumn 2025 — oversized jacket, cropped tank and wide trouser"
@@ -59,12 +68,17 @@ export default function HomePage() {
                 className="object-contain object-bottom"
               />
             </div>
-            <span
-              aria-hidden="true"
-              className="kire-hero pointer-events-none absolute bottom-8 -left-[20vw] hidden text-[clamp(64px,10vw,148px)] text-blue-600 select-none md:block"
+            <Parallax
+              speed={-24}
+              className="pointer-events-none absolute bottom-8 -left-[20vw] hidden md:block"
             >
-              Saile
-            </span>
+              <span
+                aria-hidden="true"
+                className="kire-hero text-[clamp(64px,10vw,148px)] text-blue-600 select-none"
+              >
+                Saile
+              </span>
+            </Parallax>
           </div>
 
           {/* right column */}
@@ -100,16 +114,19 @@ export default function HomePage() {
             />
           ))}
 
-          <div className="flex items-center justify-center gap-3 border-2 border-cream-100 py-10 text-cream-100">
+          <Reveal className="flex items-center justify-center gap-3 border-2 border-cream-100 py-10 text-cream-100">
             <span className="font-display text-[34px] uppercase tracking-[-0.02em] [writing-mode:vertical-rl]">
               Vancouver
             </span>
             <span className="font-script text-[42px] leading-none [writing-mode:vertical-rl]">
               Signature
             </span>
-          </div>
+          </Reveal>
 
-          <div className="flex flex-col border-2 border-blue-600 bg-cream-100">
+          <Reveal
+            delay={80}
+            className="group flex flex-col border-2 border-blue-600 bg-cream-100"
+          >
             <span className="kire-label px-4 pt-3 pb-2">/ Quality</span>
             <div className="p-3 pt-0">
               <MediaFrame
@@ -119,9 +136,12 @@ export default function HomePage() {
                 sizes="(max-width: 768px) 50vw, 25vw"
               />
             </div>
-          </div>
+          </Reveal>
 
-          <div className="flex flex-col border border-line-200 bg-paper md:col-span-2">
+          <Reveal
+            delay={160}
+            className="group flex flex-col border border-line-200 bg-paper md:col-span-2"
+          >
             <span className="kire-label px-4 pt-3 pb-2">/ Lookbook</span>
             <div className="p-3 pt-0">
               <MediaFrame
@@ -131,9 +151,12 @@ export default function HomePage() {
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
-          </div>
+          </Reveal>
 
-          <div className="col-span-2 flex items-end border-2 border-cream-100 p-4 md:col-span-1">
+          <Reveal
+            delay={240}
+            className="col-span-2 flex items-end border-2 border-cream-100 p-4 md:col-span-1"
+          >
             <ButtonLink
               href="/collection"
               variant="invert"
@@ -142,7 +165,7 @@ export default function HomePage() {
             >
               All products
             </ButtonLink>
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -154,20 +177,22 @@ export default function HomePage() {
       {/* Brand story */}
       <section
         id="about"
-        className="relative scroll-mt-16 bg-photo-grey px-[var(--page-pad-x)] py-20"
+        className="relative scroll-mt-16 overflow-hidden bg-photo-grey px-[var(--page-pad-x)] py-20"
       >
-        <Image
-          src={versioned("/media/story-coat.jpg")}
-          alt=""
-          fill
-          sizes="100vw"
-          className="kire-photo object-cover"
-        />
+        <Parallax speed={44} origin="scale(1.18)" className="absolute inset-0">
+          <Image
+            src={versioned("/media/story-coat.jpg")}
+            alt=""
+            fill
+            sizes="100vw"
+            className="kire-photo object-cover"
+          />
+        </Parallax>
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,11,11,0)_0%,rgba(11,11,11,0.55)_100%)]" />
 
         <div className="relative mx-auto max-w-[1440px]">
           <div className="grid gap-16 md:grid-cols-2">
-            <div className="max-w-[320px] bg-cream-100 p-6">
+            <Reveal className="max-w-[320px] bg-cream-100 p-6">
               <h3 className="mb-3 text-heading leading-snug font-bold tracking-[-0.02em] uppercase">
                 Brand story
               </h3>
@@ -176,9 +201,12 @@ export default function HomePage() {
                 the list short. Every piece is cut in Vancouver, in runs small
                 enough that we know how many exist.
               </p>
-            </div>
+            </Reveal>
 
-            <div className="max-w-[320px] justify-self-end bg-cream-100 p-6 text-right md:mt-24">
+            <Reveal
+              delay={120}
+              className="max-w-[320px] justify-self-end bg-cream-100 p-6 text-right md:mt-24"
+            >
               <h3 className="mb-3 text-heading leading-snug font-bold tracking-[-0.02em] uppercase">
                 Vancouver signature
               </h3>
@@ -186,7 +214,7 @@ export default function HomePage() {
                 Wool for the rain, cotton for the rest of the year. The fit is
                 loose through the shoulder and closed at the wrist.
               </p>
-            </div>
+            </Reveal>
           </div>
 
           <div className="mt-16 flex justify-center">
@@ -199,12 +227,12 @@ export default function HomePage() {
 
       {/* Featured looks */}
       <section className="bg-cream-200 px-[var(--page-pad-x)] py-16">
-        <div className="mx-auto max-w-[1440px] bg-cream-100 p-6 md:p-12">
+        <Reveal className="mx-auto max-w-[1440px] bg-cream-100 p-6 md:p-12">
           <div className="grid items-center gap-6 md:grid-cols-[1fr_240px_1fr]">
             <SectionHeading tone="accent" script="Product name">
               Featured
             </SectionHeading>
-            <div className="mx-auto w-[180px] md:w-[240px]">
+            <div className="group mx-auto w-[180px] md:w-[240px]">
               <MediaFrame
                 src={versioned("/media/featured-portrait.jpg")}
                 alt="Look 04 — close crop"
@@ -216,12 +244,12 @@ export default function HomePage() {
               Looks
             </SectionHeading>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* Newsletter */}
       <section className="bg-ink-900 px-[var(--page-pad-x)] py-16 text-cream-100">
-        <div className="mx-auto grid max-w-[1440px] gap-8 md:grid-cols-2 md:items-end">
+        <Reveal className="mx-auto grid max-w-[1440px] gap-8 md:grid-cols-2 md:items-end">
           <SectionHeading size="title" tone="invert">
             Restocks only
           </SectionHeading>
@@ -231,7 +259,7 @@ export default function HomePage() {
             </p>
             <NewsletterForm />
           </div>
-        </div>
+        </Reveal>
       </section>
     </>
   );
