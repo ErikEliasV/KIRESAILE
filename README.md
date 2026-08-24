@@ -4,7 +4,6 @@ Uma landing page de e-commerce desenvolvida com Next.js 16, TypeScript e Tailwin
 
 ![Preview do projeto](./screenshots/hero.png)
 
-<!-- 🔗 **[Ver projeto ao vivo](https://SEU-LINK-AQUI)** — adicione o link depois do deploy (Vercel, por exemplo) -->
 
 ---
 
@@ -15,8 +14,6 @@ Site institucional e de vendas single-brand que simula a experiência de um e-co
 O nome **KIRESAILE** é o meu próprio nome — **Erik Elias** — invertido (Erik → *Kire*, Elias → *Saile*). O projeto não representa uma marca real; é um exercício de portfólio para demonstrar front-end, design de interface e programação de shaders aplicados a um caso de uso de e-commerce.
 
 ### Screenshots
-
-> Crie uma pasta `screenshots/` na raiz do projeto e salve cada imagem com o nome indicado. Sugestão: navegador em ~1440px de largura, tema claro, sem o cursor do mouse visível.
 
 | Seção | Arquivo | O que fotografar |
 |-------|---------|-------------------|
