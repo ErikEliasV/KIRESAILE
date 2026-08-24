@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
 import { ButtonLink } from "@/components/ui/button";
 import { Marquee } from "@/components/ui/marquee";
 import { MediaFrame } from "@/components/ui/media-frame";
@@ -8,8 +9,29 @@ import { FabricSection } from "@/components/fabric-section";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { Parallax } from "@/components/parallax";
 import { Reveal } from "@/components/reveal";
+import { Typewriter } from "@/components/typewriter";
 import { versioned } from "@/lib/asset-version";
 import { getVersionedProducts } from "@/lib/versioned-catalog";
+
+/** Hero intro cue. `.kire-intro` holds the element at the `from` state until
+ *  the preloader stamps <html>, then plays it in — see app/globals.css. */
+const intro = (delay: number, x = 0, y = 30): CSSProperties =>
+  ({
+    "--in-delay": `${delay}ms`,
+    "--in-x": `${x}px`,
+    "--in-y": `${y}px`,
+  }) as CSSProperties;
+
+/**
+ * How the three product tiles enter the wall: the middle one rises out of
+ * the floor first, then the flanks slide in from their own side of the
+ * screen, each landing in the slot the one before it left open.
+ */
+const WALL_ENTRY = [
+  { reveal: "left" as const, delay: 170 },
+  { reveal: "bottom" as const, delay: 0 },
+  { reveal: "right" as const, delay: 340 },
+];
 
 export default function HomePage() {
   const wall = getVersionedProducts().slice(0, 3);
@@ -20,24 +42,30 @@ export default function HomePage() {
           section's bottom edge with no padding under her. */}
       <section className="relative overflow-hidden bg-cream-100 px-[var(--page-pad-x)]">
         <div className="relative mx-auto grid max-w-[1440px] items-end gap-6 pt-6 md:grid-cols-[minmax(0,1fr)_minmax(480px,900px)_minmax(0,1fr)]">
-          {/* left column */}
+          {/* left column — the wordmark writes itself on, so it carries no
+              .kire-intro fade of its own; the typing is the entrance. */}
           <div className="flex flex-col gap-8 pb-10">
             <SectionHeading as="h1" size="hero" tone="accent" className="mt-10">
-              Kire
+              <Typewriter text="Kire" startDelay={700} erase={2} />
             </SectionHeading>
-            <ButtonLink
-              href="/collection"
-              variant="secondary"
-              size="lg"
-              className="self-start bg-paper"
+            <div
+              className="kire-intro flex flex-col gap-8"
+              style={intro(2500, -44, 0)}
             >
-              Shop now
-            </ButtonLink>
-            <div className="kire-label flex items-end gap-4">
-              <span className="h-[90px] border-l border-ink-900 pl-1.5 [writing-mode:vertical-rl] [transform:rotate(180deg)]">
-                2025
-              </span>
-              <span className="text-ink-500">Est.</span>
+              <ButtonLink
+                href="/collection"
+                variant="secondary"
+                size="lg"
+                className="self-start bg-paper"
+              >
+                Shop now
+              </ButtonLink>
+              <div className="kire-label flex items-end gap-4">
+                <span className="h-[90px] border-l border-ink-900 pl-1.5 [writing-mode:vertical-rl] [transform:rotate(180deg)]">
+                  2025
+                </span>
+                <span className="text-ink-500">Est.</span>
+              </div>
             </div>
           </div>
 
@@ -54,19 +82,24 @@ export default function HomePage() {
               >
                 <span
                   aria-hidden="true"
-                  className="kire-hero block text-center text-[clamp(56px,13vw,190px)] text-cream-300 select-none"
+                  className="kire-intro kire-hero block text-center text-[clamp(56px,13vw,190px)] text-cream-300 select-none"
+                  style={intro(250, 0, -150)}
                 >
                   Kiresaile
                 </span>
               </Parallax>
-              <Image
-                src={versioned("/media/girl-model-mono-edit.png")}
-                alt="KIRESAILE Autumn 2025 — oversized jacket, cropped tank and wide trouser"
-                fill
-                priority
-                sizes="(max-width: 768px) 96vw, 900px"
-                className="object-contain object-bottom"
-              />
+              {/* Own wrapper so the wipe clips the model alone — clipping the
+                  container would cut the 220vw ghost wordmark with her. */}
+              <div className="kire-intro-media absolute inset-0">
+                <Image
+                  src={versioned("/media/girl-model-mono-edit.png")}
+                  alt="KIRESAILE Autumn 2025 — oversized jacket, cropped tank and wide trouser"
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 96vw, 900px"
+                  className="object-contain object-bottom"
+                />
+              </div>
             </div>
             <Parallax
               speed={-24}
@@ -76,24 +109,30 @@ export default function HomePage() {
                 aria-hidden="true"
                 className="kire-hero text-[clamp(64px,10vw,148px)] text-blue-600 select-none"
               >
-                Saile
+                <Typewriter text="Saile" startDelay={2000} />
               </span>
             </Parallax>
           </div>
 
-          {/* right column */}
+          {/* right column — Vancouver writes while Saile writes opposite it,
+              then the signature is drawn underneath in Sacramento. */}
           <div className="flex flex-col items-end gap-6 pb-10 text-right">
-            <p className="max-w-[210px] text-ink-500">
+            <p
+              className="kire-intro max-w-[210px] text-ink-500"
+              style={intro(900, 44, 0)}
+            >
               Autumn 2025. Tailoring cut for daily wear, made in small runs and
               restocked only when the fabric allows.
             </p>
             <SectionHeading
               align="right"
               tone="accent"
-              script="Signature"
               className="mt-8"
+              script={
+                <Typewriter text="Signature" startDelay={2000} speed={105} />
+              }
             >
-              Vancouver
+              <Typewriter text="Vancouver" startDelay={1200} />
             </SectionHeading>
           </div>
         </div>
@@ -102,8 +141,10 @@ export default function HomePage() {
       <Marquee text="Collection" tone="cream" />
 
       {/* Collection wall — one cell is always an inverted panel, never four
-          identical tiles. */}
-      <section className="bg-blue-600 px-[var(--page-pad-x)] py-12">
+          identical tiles. The cells slot in one at a time, centre first and
+          then the flanks, so the wall builds itself instead of fading up as
+          one slab. */}
+      <section className="kire-reveal-band bg-blue-600 px-[var(--page-pad-x)] py-12">
         <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-[var(--gutter)] md:grid-cols-4">
           {wall.map((product, index) => (
             <ProductCard
@@ -111,10 +152,16 @@ export default function HomePage() {
               product={product}
               sizes="(max-width: 768px) 50vw, 25vw"
               priority={index === 0}
+              reveal={WALL_ENTRY[index].reveal}
+              delay={WALL_ENTRY[index].delay}
             />
           ))}
 
-          <Reveal className="flex items-center justify-center gap-3 border-2 border-cream-100 py-10 text-cream-100">
+          <Reveal
+            variant="bottom"
+            delay={510}
+            className="flex items-center justify-center gap-3 border-2 border-cream-100 py-10 text-cream-100"
+          >
             <span className="font-display text-[34px] uppercase tracking-[-0.02em] [writing-mode:vertical-rl]">
               Vancouver
             </span>
@@ -124,7 +171,8 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal
-            delay={80}
+            variant="left"
+            delay={170}
             className="group flex flex-col border-2 border-blue-600 bg-cream-100"
           >
             <span className="kire-label px-4 pt-3 pb-2">/ Quality</span>
@@ -139,7 +187,7 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal
-            delay={160}
+            variant="bottom"
             className="group flex flex-col border border-line-200 bg-paper md:col-span-2"
           >
             <span className="kire-label px-4 pt-3 pb-2">/ Lookbook</span>
@@ -154,7 +202,8 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal
-            delay={240}
+            variant="right"
+            delay={340}
             className="col-span-2 flex items-end border-2 border-cream-100 p-4 md:col-span-1"
           >
             <ButtonLink
@@ -192,7 +241,7 @@ export default function HomePage() {
 
         <div className="relative mx-auto max-w-[1440px]">
           <div className="grid gap-16 md:grid-cols-2">
-            <Reveal className="max-w-[320px] bg-cream-100 p-6">
+            <Reveal variant="left" className="max-w-[320px] bg-cream-100 p-6">
               <h3 className="mb-3 text-heading leading-snug font-bold tracking-[-0.02em] uppercase">
                 Brand story
               </h3>
@@ -204,7 +253,8 @@ export default function HomePage() {
             </Reveal>
 
             <Reveal
-              delay={120}
+              variant="right"
+              delay={140}
               className="max-w-[320px] justify-self-end bg-cream-100 p-6 text-right md:mt-24"
             >
               <h3 className="mb-3 text-heading leading-snug font-bold tracking-[-0.02em] uppercase">
@@ -226,7 +276,7 @@ export default function HomePage() {
       </section>
 
       {/* Featured looks */}
-      <section className="bg-cream-200 px-[var(--page-pad-x)] py-16">
+      <section className="kire-reveal-band bg-cream-200 px-[var(--page-pad-x)] py-16">
         <Reveal className="mx-auto max-w-[1440px] bg-cream-100 p-6 md:p-12">
           <div className="grid items-center gap-6 md:grid-cols-[1fr_240px_1fr]">
             <SectionHeading tone="accent" script="Product name">

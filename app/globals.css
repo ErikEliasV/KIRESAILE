@@ -53,7 +53,22 @@
   --dur-fast: 140ms;
   --dur-base: 220ms;
   --dur-slow: 420ms;
+  /* Entrances are deliberately longer than interactions — a 420ms reveal
+     reads as a pop, not as an arrival, and at scrolling speed it is over
+     before the element is properly on screen. */
+  --dur-reveal: 1300ms;
+  --dur-intro: 1400ms;
   --ease-standard: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
+  /* Long tail, no bounce: a piece decelerates hard into its slot and stops
+     dead, which is what makes the grid read as assembling rather than sliding. */
+  --ease-settle: cubic-bezier(0.14, 0.8, 0.16, 1);
+
+  /* How far an entering element starts off its resting place. Both scale
+     with the viewport so the travel reads the same on a phone. */
+  --rv-travel: clamp(64px, 11vw, 190px);
+  --rv-rise: clamp(110px, 18vh, 260px);
 }
 
 @theme inline {
@@ -94,11 +109,15 @@
   --radius-none: 0px;
 
   --ease-standard: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Reserve the scrollbar gutter permanently, so locking the page during
+       the preloader does not shift the layout sideways when it unlocks. */
+    scrollbar-gutter: stable;
   }
 
   body {
@@ -155,28 +174,287 @@
   .kire-photo {
     filter: grayscale(1) contrast(1.05);
   }
+}
 
-  /* Scroll reveal: fades a section/card up into place the first time it
-     crosses the viewport. Reduced-motion users get the 0.01ms override
-     below, so this stays honest about being decorative. */
-  .kire-reveal {
+/* ==================================================================
+   Scroll reveal.
+
+   Deliberately UNLAYERED. Tailwind's `transition-*` utilities live in
+   @layer utilities, which outranks @layer components no matter how
+   specific the selector is — a card carrying `transition-transform`
+   silently replaced this whole shorthand and dropped its opacity half,
+   so the card snapped from invisible to visible instead of fading in.
+   Rules outside every layer sit above all of them, so this always wins.
+   ================================================================== */
+.kire-reveal {
+  opacity: 0;
+  transform: translate3d(var(--rv-x, 0px), var(--rv-y, 36px), 0)
+    scale(var(--rv-scale, 1));
+  transition:
+    opacity var(--dur-reveal) var(--ease-settle) var(--rv-delay, 0ms),
+    transform var(--dur-reveal) var(--ease-settle) var(--rv-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.kire-reveal.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  will-change: auto;
+}
+
+/* Direction rides on a data attribute rather than a class, so no Tailwind
+   utility of a similar name can ever collide with it. */
+.kire-reveal[data-reveal="up"] {
+  --rv-y: 36px;
+}
+
+/* "bottom" is the deep rise used by grid tiles — it travels far enough that
+   you watch it arrive, where "up" is a short lift for blocks of copy. */
+.kire-reveal[data-reveal="bottom"] {
+  --rv-y: var(--rv-rise);
+}
+
+.kire-reveal[data-reveal="left"] {
+  --rv-x: calc(-1 * var(--rv-travel));
+  --rv-y: 0px;
+}
+
+.kire-reveal[data-reveal="right"] {
+  --rv-x: var(--rv-travel);
+  --rv-y: 0px;
+}
+
+.kire-reveal[data-reveal="zoom"] {
+  --rv-y: 20px;
+  --rv-scale: 0.94;
+}
+
+/* A side-entering element starts outside its own column, so the band it
+   travels through has to clip — otherwise it widens the page. */
+.kire-reveal-band {
+  overflow-x: clip;
+}
+
+/* ==================================================================
+   Intro — the first-paint choreography, held back until the preloader
+   lifts its curtain. `data-preloader` is stamped onto <html> by the
+   blocking script in the document head, then driven by <Preloader>.
+   ================================================================== */
+.kire-intro {
+  opacity: 0;
+}
+
+html[data-preloader="exiting"] .kire-intro,
+html[data-preloader="done"] .kire-intro {
+  animation: kire-intro-in var(--dur-intro) var(--ease-out-expo)
+    var(--in-delay, 0ms) both;
+}
+
+html[data-preloader="exiting"] .kire-intro-media,
+html[data-preloader="done"] .kire-intro-media {
+  animation: kire-intro-media-in 1900ms var(--ease-out-expo)
+    var(--in-delay, 0ms) both;
+}
+
+@keyframes kire-intro-in {
+  from {
     opacity: 0;
-    transform: translateY(28px);
-    transition:
-      opacity var(--dur-slow) var(--ease-standard),
-      transform var(--dur-slow) var(--ease-standard);
+    transform: translate3d(var(--in-x, 0px), var(--in-y, 30px), 0);
   }
-
-  .kire-reveal.is-visible {
+  to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
+}
+
+/* The model wipes down from her own top edge rather than sliding — she is
+   glued to the section's bottom rule, so nothing may move vertically. */
+@keyframes kire-intro-media-in {
+  from {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    transform: scale(1.05);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: scale(1);
+  }
+}
+
+/* ==================================================================
+   Typewriter — the hero wordmarks write themselves on.
+
+   The full text is always in the box as a hidden sizer, so the line never
+   reflows as characters land; the animated copy is painted over it. Screen
+   readers get the plain string from the .sr-only twin, since neither the
+   sizer (visibility: hidden) nor the aria-hidden overlay is exposed.
+   ================================================================== */
+.kire-type {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.kire-type__sizer {
+  visibility: hidden;
+}
+
+.kire-type__out {
+  position: absolute;
+  inset: 0;
+  /* Always left-anchored: the sizer is exactly text-width, so a left-grown
+     line lands precisely on the resting position even inside a right-aligned
+     heading — where right-anchoring would slide the whole word as it grows. */
+  text-align: left;
+  white-space: pre;
+}
+
+.kire-caret {
+  display: inline-block;
+  width: 0.055em;
+  min-width: 2px;
+  height: 0.68em;
+  margin-left: 0.05em;
+  background: currentColor;
+  animation: kire-caret-blink 1000ms steps(1, end) infinite;
+}
+
+@keyframes kire-caret-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ==================================================================
+   Preloader.
+   ================================================================== */
+html[data-preloader="loading"] {
+  overflow: hidden;
+  /* Keep the smooth-scroll base rule from animating the reset to the top. */
+  scroll-behavior: auto;
+}
+
+/* Returning visitors in the same tab get the attribute before first paint,
+   so the markup React server-rendered never flashes. */
+html[data-preloader="done"] .kire-preloader {
+  display: none;
+}
+
+.kire-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow: hidden;
+  color: var(--ink-900);
+}
+
+/* The curtain: vertical panels that lift in sequence, so the page is
+   uncovered like a set of shutters instead of a single flat fade. */
+.kire-preloader-shutters {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+}
+
+.kire-preloader-shutter {
+  background: var(--cream-100);
+  border-right: 1px solid var(--cream-300);
+}
+
+.kire-preloader-shutter:last-child {
+  border-right: 0;
+}
+
+html[data-preloader="exiting"] .kire-preloader-shutter {
+  animation: kire-shutter-up 1150ms var(--ease-in-out-quint)
+    var(--shutter-delay, 0ms) both;
+}
+
+@keyframes kire-shutter-up {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -101%, 0);
+  }
+}
+
+.kire-preloader-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+  padding: 20px var(--page-pad-x) 24px;
+}
+
+html[data-preloader="exiting"] .kire-preloader-inner {
+  animation: kire-preloader-out 560ms var(--ease-standard) both;
+}
+
+@keyframes kire-preloader-out {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, -18px, 0);
+  }
+}
+
+/* Each letter rides up out of its own mask. */
+.kire-preloader-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.kire-preloader-letter {
+  display: inline-block;
+  animation: kire-letter-up 1250ms var(--ease-out-expo)
+    var(--letter-delay, 0ms) both;
+}
+
+@keyframes kire-letter-up {
+  from {
+    transform: translate3d(0, 110%, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.kire-preloader-rule {
+  position: relative;
+  height: 2px;
+  overflow: hidden;
+  background: var(--cream-300);
+}
+
+.kire-preloader-bar {
+  position: absolute;
+  inset: 0;
+  background: var(--blue-600);
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
 }
 
 /* ------------------------------------------------------------------
    Custom cursor. Square, not round — the DS draws everything in rules.
-   Mounted once from CursorFollower; hidden on touch/coarse pointers and
-   for prefers-reduced-motion (native cursor takes over instead).
+   Mounted once from CursorFollower; hidden on touch/coarse pointers.
+   Sits above the preloader so it stays visible over the curtain.
    ------------------------------------------------------------------ */
 .kire-has-cursor,
 .kire-has-cursor a,
@@ -190,7 +468,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 80;
+  z-index: 210;
   pointer-events: none;
   will-change: transform;
   transform: translate3d(-50%, -50%, 0);
@@ -230,7 +508,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 80;
+  z-index: 210;
   pointer-events: none;
   transform: translate3d(-50%, calc(-50% + 30px), 0);
   opacity: 0;
@@ -249,25 +527,37 @@
   opacity: 1;
 }
 
+/* ------------------------------------------------------------------
+   prefers-reduced-motion.
+
+   This block used to force every animation and transition on the page to
+   0.01ms and pin .kire-reveal / .kire-intro to their finished state. On any
+   machine reporting `reduce` that made the whole system invisible: no
+   reveals, no hero choreography, and a preloader whose letters and shutters
+   snapped instead of moving — the site looked identical no matter what was
+   changed. Windows reports `reduce` whenever Settings > Accessibility >
+   Visual effects > "Animation effects" is off, which is a common
+   performance tweak rather than a stated accessibility need, so the rule
+   was silently switching the brand off for a large share of visitors.
+
+   The choreography is now unconditional — the same call already made for
+   the cursor follower and parallax in 3aceaf2. Scroll behaviour is the one
+   thing still eased off: a smooth-scroll jump is the only motion here that
+   genuinely provokes motion sickness, and suppressing it hides no content.
+
+   To honour the setting again, put the entrances back under this query:
+     .kire-reveal, .kire-intro, .kire-intro-media {
+       animation: none !important;
+       transition: opacity 200ms linear !important;
+       transform: none !important;
+       clip-path: none !important;
+     }
+   That keeps a cross-fade — which vestibular guidance permits — instead of
+   the blanket freeze, so the page still reads as alive.
+   ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  /* The marquee is the brand's one deliberate continuous motion (see DS
-     motion guidelines) — exempt it so it keeps looping instead of freezing
-     after a single 0.01ms tick. */
-  .kire-marquee-track {
-    animation-duration: var(--marquee-dur, 26s) !important;
-    animation-iteration-count: infinite !important;
   }
 }
 
