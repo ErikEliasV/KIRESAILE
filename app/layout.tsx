@@ -5,6 +5,7 @@ import { CartProvider } from "@/components/cart-context";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CartDrawer } from "@/components/cart-drawer";
+import { CursorFollower } from "@/components/cursor-follower";
 
 const archivo = Archivo({
   variable: "--font-archivo",
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <main className="flex-1">{children}</main>
           <SiteFooter />
           <CartDrawer />
+          <CursorFollower />
         </CartProvider>
       </body>
     </html>

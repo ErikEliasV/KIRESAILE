@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Icon, type IconName } from "@/components/ui/icon";
+import { Reveal } from "@/components/reveal";
 
 const STORES = [
   "1042 Mainland Street, Vancouver",
@@ -26,7 +27,7 @@ export function SiteFooter() {
       id="contact"
       className="scroll-mt-24 border-t border-line-200 bg-cream-100"
     >
-      <div className="mx-auto grid max-w-[1440px] gap-10 px-[var(--page-pad-x)] py-16 md:grid-cols-[1.2fr_1fr_1fr_1fr]">
+      <Reveal className="mx-auto grid max-w-[1440px] gap-10 px-[var(--page-pad-x)] py-16 md:grid-cols-[1.2fr_1fr_1fr_1fr]">
         <div className="flex flex-col gap-4">
           <span className="font-display text-[20px] uppercase tracking-[0.22em]">
             Kiresaile
@@ -72,7 +73,7 @@ export function SiteFooter() {
             </a>
           ))}
         </div>
-      </div>
+      </Reveal>
 
       <div className="mx-auto flex max-w-[1440px] flex-col gap-2 border-t border-line-200 px-[var(--page-pad-x)] py-6 md:flex-row md:items-center md:justify-between">
         <span className="kire-label text-ink-300">

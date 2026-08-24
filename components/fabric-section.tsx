@@ -1,5 +1,6 @@
 import { ShaderFilm } from "@/components/shader-film";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { Reveal } from "@/components/reveal";
 import { versioned } from "@/lib/asset-version";
 
 const SPECS = [
@@ -27,7 +28,7 @@ export function FabricSection() {
           </p>
         </div>
 
-        <div className="border-2 border-blue-600 bg-cream-100 p-3">
+        <Reveal className="border-2 border-blue-600 bg-cream-100 p-3">
           <div className="relative">
             <ShaderFilm
               src={versioned("/media/video_tecido.mp4")}
@@ -60,7 +61,7 @@ export function FabricSection() {
               </div>
             ))}
           </dl>
-        </div>
+        </Reveal>
       </div>
     </section>
   );
